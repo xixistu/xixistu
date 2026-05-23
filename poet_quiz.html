@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>千古诗人 · 墨韵流芳</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
+
+  :root {
+    --paper: #f5f0e8;
+    --ink: #2c2c2c;
+    --ink-light: #5a5a5a;
+    --accent: #8b4513;
+    --accent-light: #a0522d;
+    --gold: #8b6914;
+    --red-seal: #c04040;
+    --border-subtle: #d4c5a9;
+    --bg-card: rgba(255,252,245,0.85);
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --correct: #2d6a2d;
+    --wrong: #a03030;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Serif SC', 'ZCOOL XiaoWei', 'SimSun', 'STSong', serif;
+    background-color: var(--paper);
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 Q35 30 30 55' stroke='%23d4c5a9' fill='none' stroke-width='0.3' opacity='0.5'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse at 20% 80%, rgba(180,160,130,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 15%, rgba(160,140,110,0.10) 0%, transparent 50%);
+    color: var(--ink);
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* ── Subtle ink-wash mountain background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 45vh;
+    background:
+      radial-gradient(ellipse 120% 100% at 15% 120%, rgba(100,90,70,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 100% at 50% 120%, rgba(90,80,65,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 110% 100% at 85% 120%, rgba(100,85,60,0.07) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Top Navigation ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgba(245,240,232,0.92);
+    backdrop-filter: blur(6px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand {
+    font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
+    font-size: 1.8rem;
+    color: var(--ink);
+    letter-spacing: 3px;
+  }
+  .brand::before { content:'🏮 '; font-size:1.4rem; }
+  .nav-links { display:flex; gap:10px; flex-wrap:wrap; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--ink-light);
+    padding: 6px 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    font-size: 0.92rem;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .nav-links a:hover, .nav-links a.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  /* ── Main Container ── */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 50px 20px 40px;
+  }
+  .hero h1 {
+    font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
+    font-size: 3.4rem;
+    color: var(--ink);
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    font-size: 1.05rem;
+    color: var(--ink-light);
+    letter-spacing: 4px;
+  }
+  .hero .ink-divider {
+    margin: 18px auto 0;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .hero .decorative-vine {
+    margin: 10px auto 0;
+    width: 200px;
+    height: 40px;
+    background: url("data:image/svg+xml,%3Csvg width='200' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 35 Q50 10 100 30 Q150 50 190 25' stroke='%238b4513' fill='none' stroke-width='1.2' opacity='0.4'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  /* ── Poet Card (Mountain-Waterfall Illustration Block) ── */
+  .poet-illustration {
+    text-align: center;
+    margin: 10px 0 30px;
+  }
+  .illustration-block {
+    display: inline-block;
+    width: 280px;
+    height: 160px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #e8e0d0 0%, #f0e8d8 40%, #e8ddd0 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  /* CSS-only landscape: mountains, waterfall, pine, moon */
+  .illustration-block .moon {
+    position: absolute;
+    top: 18px; right: 35px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #fff8e8, #e8d8b0);
+    box-shadow: 0 0 18px rgba(200,170,100,0.3);
+  }
+  .illustration-block .mountain { position:absolute; bottom:0; }
+  .illustration-block .mountain.m1 {
+    left: -10px; width: 140px; height: 90px;
+    background: linear-gradient(175deg, #b0a090 0%, #8a7a6a 70%, #6a5a4a 100%);
+    clip-path: polygon(0% 100%, 15% 30%, 35% 15%, 55% 35%, 70% 20%, 100% 100%);
+    opacity: 0.55;
+  }
+  .illustration-block .mountain.m2 {
+    right: -5px; width: 160px; height: 105px;
+    background: linear-gradient(175deg, #9a8a78 0%, #7a6a58 70%, #5a4a3a 100%);
+    clip-path: polygon(0% 100%, 10% 40%, 30% 20%, 50% 38%, 70% 15%, 100% 100%);
+    opacity: 0.60;
+  }
+  .illustration-block .mountain.m3 {
+    left: 40px; right: 40px; width: auto; height: 65px;
+    background: linear-gradient(175deg, #c0b0a0 0%, #9a8a78 60%, #7a6a58 100%);
+    clip-path: polygon(0% 100%, 20% 50%, 40% 28%, 60% 50%, 80% 30%, 100% 100%);
+    opacity: 0.40;
+  }
+  .illustration-block .waterfall {
+    position: absolute;
+    top: 30px; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 55px;
+    background: linear-gradient(180deg, rgba(200,210,230,0.7), rgba(180,200,220,0.5), rgba(160,190,210,0.3));
+    border-radius: 3px;
+  }
+  .illustration-block .pine {
+    position: absolute;
+    bottom: 15px; left: 28px;
+    width: 3px; height: 35px;
+    background: #5a4a3a;
+    border-radius: 2px;
+  }
+  .illustration-block .pine::after {
+    content: '';
+    position: absolute;
+    top: -12px; left: -10px;
+    width: 24px; height: 20px;
+    background: radial-gradient(ellipse at center, #6a7a5a 0%, #4a5a3a 100%);
+    border-radius: 45% 45% 40% 40%;
+  }
+  .illustration-block .boat {
+    position: absolute;
+    bottom: 22px; right: 40px;
+    width: 22px; height: 6px;
+    background: #6a5040;
+    border-radius: 0 0 12px 12px;
+    opacity: 0.5;
+  }
+  .illustration-block .bird {
+    position: absolute;
+    top: 50px; right: 60px;
+    font-size: 0.7rem;
+    color: #6a5a4a;
+    opacity: 0.4;
+    letter-spacing: 4px;
+  }
+
+  /* ── Section Title ── */
+  .section-title {
+    text-align: center;
+    margin: 50px 0 30px;
+    font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
+    font-size: 2rem;
+    color: var(--ink);
+    letter-spacing: 6px;
+    position: relative;
+  }
+  .section-title::after {
+    content: '';
+    display: block;
+    margin: 12px auto 0;
+    width: 60px;
+    height: 1.5px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* ── Poet Grid ── */
+  .poet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 28px;
+  }
+  .poet-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 30px 28px;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .poet-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  }
+  .poet-card .seal {
+    position: absolute;
+    top: 16px; right: 20px;
+    width: 42px; height: 42px;
+    border: 2px solid var(--red-seal);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.1rem;
+    color: var(--red-seal);
+    transform: rotate(8deg);
+    opacity: 0.6;
+  }
+  .poet-card .poet-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px dotted var(--border-subtle);
+    padding-bottom: 12px;
+  }
+  .poet-card .poet-name {
+    font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive;
+    font-size: 1.8rem;
+    color: var(--ink);
+    letter-spacing: 4px;
+  }
+  .poet-card .poet-era {
+    font-size: 0.9rem;
+    color: var(--ink-light);
+    letter-spacing: 2px;
+  }
+  .poet-card .poet-bio {
+    font-size: 0.95rem;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+    text-indent: 2em;
+  }
+  .poet-card .label {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .poet-card .masterpiece, .poet-card .quote {
+    font-size: 0.95rem;
+    color: var(--ink-light);
+    margin-bottom: 12px;
+    padding-left: 16px;
+    border-left: 2px solid var(--border-subtle);
+    line-height: 1.9;
+  }
+  .poet-card .quote {
+    font-style: italic;
+  }
+
+  /* ── Quiz Section ── */
+  .quiz-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 32px 30px;
+    box-shadow: var(--shadow);
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .quiz-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .quiz-progress .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border-subtle);
+    transition: background 0.3s;
+  }
+  .quiz-progress .dot.done { background: var(--accent); }
+  .quiz-progress .dot.current { background: var(--ink); }
+  .quiz-counter {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+  .quiz-question {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 20px;
+    line-height: 1.7;
+    padding: 14px 18px;
+    background: rgba(139,69,19,0.04);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255,252,245,0.6);
+    font-size: 0.95rem;
+    color: var(--ink);
+    user-select: none;
+  }
+  .quiz-option:hover:not(.disabled) { background: rgba(139,69,19,0.06); border-color: var(--accent-light); }
+  .quiz-option.selected { border-color: var(--accent); background: rgba(139,69,19,0.1); }
+  .quiz-option.correct { border-color: var(--correct); background: rgba(45,106,45,0.08); }
+  .quiz-option.wrong { border-color: var(--wrong); background: rgba(160,48,48,0.06); }
+  .quiz-option.disabled { cursor: default; pointer-events: none; }
+  .quiz-option .radio {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border-subtle);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .quiz-option.selected .radio {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  .quiz-option.selected .radio::after {
+    content: '';
+    width: 5px; height: 5px;
+    background: white;
+    border-radius: 50%;
+  }
+  .quiz-option.correct .radio { border-color: var(--correct); background: var(--correct); }
+  .quiz-option.wrong .radio { border-color: var(--wrong); background: var(--wrong); }
+  .quiz-option.correct .radio::after, .quiz-option.wrong .radio::after {
+    content: '✓'; color: white; font-size: 10px; font-weight: bold;
+  }
+  .quiz-option.wrong .radio::after { content: '✗'; font-size: 9px; }
+
+  .quiz-feedback {
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: rgba(45,106,45,0.08); border: 1px solid rgba(45,106,45,0.25); color: var(--correct); }
+  .quiz-feedback.wrong-fb { background: rgba(160,48,48,0.06); border: 1px solid rgba(160,48,48,0.2); color: var(--wrong); }
+
+  .quiz-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.92rem;
+    padding: 10px 24px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--bg-card);
+    color: var(--ink);
+    letter-spacing: 2px;
+    transition: all 0.25s;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-light); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+  .quiz-result {
+    text-align: center;
+    padding: 30px 20px;
+    display: none;
+  }
+  .quiz-result.show { display: block; }
+  .quiz-result .score {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 3rem;
+    color: var(--accent);
+  }
+  .quiz-result .score-msg {
+    font-size: 1rem;
+    color: var(--ink-light);
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 60px;
+    letter-spacing: 2px;
+  }
+
+  /* ── To Top Button ── */
+  .to-top {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    width: 40px; height: 40px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
+    background: var(--bg-card);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--ink-light);
+    transition: all 0.3s;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .to-top.visible { opacity: 1; pointer-events: auto; }
+  .to-top:hover { background: var(--ink); color: var(--paper); }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2.2rem; letter-spacing: 4px; }
+    .poet-grid { grid-template-columns: 1fr; }
+    .top-bar { padding: 12px 16px; }
+    .nav-links a { padding: 4px 10px; font-size: 0.8rem; }
+    .quiz-container { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ TOP BAR ═══════════ -->
+<header class="top-bar">
+  <span class="brand">墨韵诗魂</span>
+  <nav class="nav-links">
+    <a href="#poets" class="active">诗人风采</a>
+    <a href="#quiz">诗词问答</a>
+  </nav>
+</header>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <h1>千古诗人</h1>
+  <p class="subtitle">—— 墨 韵 流 芳 · 诗 词 千 古 ——</p>
+  <div class="ink-divider"></div>
+  <div class="decorative-vine"></div>
+</section>
+
+<div class="container">
+
+  <!-- ═══════════ ILLUSTRATION ═══════════ -->
+  <div class="poet-illustration">
+    <div class="illustration-block" title="山水墨韵">
+      <div class="moon"></div>
+      <div class="mountain m1"></div>
+      <div class="mountain m2"></div>
+      <div class="mountain m3"></div>
+      <div class="waterfall"></div>
+      <div class="pine"></div>
+      <div class="boat"></div>
+      <div class="bird">⪜ ⪜</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ POETS SECTION ═══════════ -->
+  <h2 class="section-title" id="poets">· 诗 人 风 采 ·</h2>
+
+  <div class="poet-grid">
+
+    <!-- ── 李白 ── -->
+    <div class="poet-card" id="libai">
+      <div class="seal">白</div>
+      <div class="poet-header">
+        <span class="poet-name">李白</span>
+        <span class="poet-era">盛唐 · 诗仙</span>
+      </div>
+      <p class="poet-bio">
+        李白（701—762），字太白，号青莲居士。唐代伟大的浪漫主义诗人，被后人誉为"诗仙"。祖籍陇西成纪，生于西域碎叶城，四岁随父迁居剑南道绵州。其诗豪放飘逸，想象奇绝，笔落惊风雨，诗成泣鬼神。一生仗剑远游，纵酒高歌，留下诗作近千首，是我国诗歌史上最璀璨的星辰之一。
+      </p>
+      <p class="label">【 代 表 作 】</p>
+      <p class="masterpiece">《将进酒》《蜀道难》《静夜思》《行路难》《梦游天姥吟留别》《望庐山瀑布》</p>
+      <p class="label">【 经 典 名 句 】</p>
+      <p class="quote">"天生我材必有用，千金散尽还复来。"<br>"长风破浪会有时，直挂云帆济沧海。"</p>
+    </div>
+
+    <!-- ── 杜甫 ── -->
+    <div class="poet-card" id="dufu">
+      <div class="seal">甫</div>
+      <div class="poet-header">
+        <span class="poet-name">杜甫</span>
+        <span class="poet-era">盛唐 · 诗圣</span>
+      </div>
+      <p class="poet-bio">
+        杜甫（712—770），字子美，自号少陵野老。唐代伟大的现实主义诗人，与李白合称"李杜"。祖籍襄阳，生于河南巩县。一生颠沛流离，亲历安史之乱，其诗沉郁顿挫，忧国忧民，被尊为"诗圣"。他的诗作记录了唐代由盛转衰的历史巨变，被誉为"诗史"，对后世影响极为深远。
+      </p>
+      <p class="label">【 代 表 作 】</p>
+      <p class="masterpiece">《春望》《登高》《茅屋为秋风所破歌》《兵车行》《三吏》《三别》</p>
+      <p class="label">【 经 典 名 句 】</p>
+      <p class="quote">"安得广厦千万间，大庇天下寒士俱欢颜。"<br>"会当凌绝顶，一览众山小。"</p>
+    </div>
+
+    <!-- ── 苏轼 ── -->
+    <div class="poet-card" id="sushi">
+      <div class="seal">轼</div>
+      <div class="poet-header">
+        <span class="poet-name">苏轼</span>
+        <span class="poet-era">北宋 · 东坡居士</span>
+      </div>
+      <p class="poet-bio">
+        苏轼（1037—1101），字子瞻，号东坡居士。北宋著名文学家、书画家、美食家。眉州眉山人。其文汪洋恣肆，其诗清新豪健，其词开豪放一派，与辛弃疾并称"苏辛"。一生宦海沉浮，屡遭贬谪而豁达旷达，将人生的苦难酿成了文学的美酒，是中国文化史上最具人格魅力的人物之一。
+      </p>
+      <p class="label">【 代 表 作 】</p>
+      <p class="masterpiece">《念奴娇·赤壁怀古》《水调歌头》《江城子·密州出猎》《赤壁赋》</p>
+      <p class="label">【 经 典 名 句 】</p>
+      <p class="quote">"但愿人长久，千里共婵娟。"<br>"大江东去，浪淘尽，千古风流人物。"</p>
+    </div>
+
+    <!-- ── 李清照 ── -->
+    <div class="poet-card" id="liqingzhao">
+      <div class="seal">照</div>
+      <div class="poet-header">
+        <span class="poet-name">李清照</span>
+        <span class="poet-era">南北宋 · 易安居士</span>
+      </div>
+      <p class="poet-bio">
+        李清照（1084—约1155），号易安居士。宋代女词人，婉约词派代表，有"千古第一才女"之称。齐州章丘人。其词以南渡为界，前期多写悠闲生活，婉丽清新；后期多悲叹身世，深沉感喟。她以女性独有的敏锐与才情，在词史上留下了不可替代的光辉篇章。
+      </p>
+      <p class="label">【 代 表 作 】</p>
+      <p class="masterpiece">《声声慢》《一剪梅》《如梦令·常记溪亭日暮》《夏日绝句》</p>
+      <p class="label">【 经 典 名 句 】</p>
+      <p class="quote">"寻寻觅觅，冷冷清清，凄凄惨惨戚戚。"<br>"此情无计可消除，才下眉头，却上心头。"</p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ QUIZ SECTION ═══════════ -->
+  <h2 class="section-title" id="quiz">· 诗 词 问 答 ·</h2>
+
+  <div class="quiz-container">
+    <div class="quiz-progress" id="quizProgress"></div>
+    <div class="quiz-counter" id="quizCounter"></div>
+    <div class="quiz-question" id="quizQuestion"></div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div class="quiz-actions" id="quizActions">
+      <button class="btn primary" id="btnSubmit" onclick="submitAnswer()">提交答案</button>
+      <button class="btn" id="btnNext" onclick="nextQuestion()" disabled>下一题</button>
+    </div>
+    <div class="quiz-result" id="quizResult"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <p>墨韵诗魂 · 千古诗人 · 诗词流芳</p>
+</footer>
+
+<!-- ═══════════ TO-TOP ═══════════ -->
+<button class="to-top" id="toTopBtn" onclick="scrollToTop()" title="返回顶部">↑</button>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+  /* ── Quiz Data ── */
+  const quizData = [
+    {
+      q: '"天生我材必有用，千金散尽还复来"出自李白的哪首诗？',
+      opts: ['《静夜思》', '《蜀道难》', '《将进酒》', '《行路难》'],
+      ans: 2,
+      explain: '此名句出自李白《将进酒》。全诗以豪放的笔调抒发人生得意须尽欢的旷达情怀，淋漓尽致地展现了李白豪迈飘逸的诗风。'
+    },
+    {
+      q: '杜甫被后人尊称为什么？',
+      opts: ['诗仙', '诗圣', '诗佛', '诗鬼'],
+      ans: 1,
+      explain: '杜甫被尊为"诗圣"，其诗沉郁顿挫、忧国忧民，被誉为"诗史"。李白被称为"诗仙"，王维被称为"诗佛"，李贺被称为"诗鬼"。'
+    },
+    {
+      q: '"但愿人长久，千里共婵娟"是哪位词人的名句？',
+      opts: ['李白', '杜甫', '苏轼', '辛弃疾'],
+      ans: 2,
+      explain: '此句出自苏轼《水调歌头·明月几时有》。该词作于宋神宗熙宁九年中秋，苏轼在密州思念弟弟子由，借月抒怀，成为千古中秋绝唱。'
+    },
+    {
+      q: '李清照是哪个词派的代表词人？',
+      opts: ['豪放派', '婉约派', '花间派', '江湖派'],
+      ans: 1,
+      explain: '李清照是婉约词派的代表，有"千古第一才女"之称。婉约词风以含蓄蕴藉、细腻柔美见长，与苏轼、辛弃疾代表的豪放派形成鲜明对照。'
+    },
+    {
+      q: '"会当凌绝顶，一览众山小"描写的是哪座山？',
+      opts: ['华山', '嵩山', '泰山', '恒山'],
+      ans: 2,
+      explain: '出自杜甫《望岳》，描写的是东岳泰山。此诗为杜甫青年时期所作，以登高望远抒发凌云之志，体现了诗人早期豪迈的气概。'
+    },
+    {
+      q: '下列哪部作品不是苏轼所作？',
+      opts: ['《赤壁赋》', '《念奴娇·赤壁怀古》', '《江城子·密州出猎》', '《醉翁亭记》'],
+      ans: 3,
+      explain: '《醉翁亭记》是欧阳修的代表作，非苏轼所作。苏轼的代表散文为前后《赤壁赋》，均写于贬谪黄州期间，展现了其豁达超然的人生态度。'
+    },
+    {
+      q: '李清照《夏日绝句》中"生当作人杰，死亦为鬼雄"是赞美谁的？',
+      opts: ['刘邦', '项羽', '韩信', '荆轲'],
+      ans: 1,
+      explain: '此诗借古讽今，高度赞扬了项羽不肯过江东的英雄气概。李清照身处北宋灭亡之际，以此诗暗讽南宋朝廷的苟安一隅、不思进取。'
+    },
+    {
+      q: '"安得广厦千万间，大庇天下寒士俱欢颜"体现了杜甫怎样的情怀？',
+      opts: ['追求享乐', '隐逸避世', '忧国忧民', '怀才不遇'],
+      ans: 2,
+      explain: '出自杜甫《茅屋为秋风所破歌》。诗人身处茅屋破漏的困境之中，却推己及人、心系天下寒士，充分体现了杜甫深沉的忧国忧民情怀。'
+    }
+  ];
+
+  let currentQ = 0;
+  let selectedOpt = null;
+  let answered = false;
+  let score = 0;
+
+  /* ── Init ── */
+  function initQuiz() {
+    currentQ = 0;
+    selectedOpt = null;
+    answered = false;
+    score = 0;
+    document.getElementById('quizResult').classList.remove('show');
+    document.getElementById('quizResult').innerHTML = '';
+    document.getElementById('quizActions').style.display = 'flex';
+    renderProgress();
+    renderQuestion();
+  }
+
+  function renderProgress() {
+    const c = document.getElementById('quizProgress');
+    c.innerHTML = quizData.map((_, i) => {
+      let cls = 'dot';
+      if (i < currentQ) cls += ' done';
+      else if (i === currentQ) cls += ' current';
+      return `<span class="${cls}"></span>`;
+    }).join('');
+    document.getElementById('quizCounter').textContent =
+      `第 ${currentQ + 1} / ${quizData.length} 题`;
+  }
+
+  function renderQuestion() {
+    const d = quizData[currentQ];
+    document.getElementById('quizQuestion').textContent = d.q;
+    const opts = document.getElementById('quizOptions');
+    opts.innerHTML = d.opts.map((o, i) => `
+      <div class="quiz-option" data-index="${i}" onclick="selectOption(${i}, this)">
+        <span class="radio"></span>
+        <span>${o}</span>
+      </div>
+    `).join('');
+    document.getElementById('quizFeedback').classList.remove('show', 'correct-fb', 'wrong-fb');
+    document.getElementById('btnSubmit').disabled = false;
+    document.getElementById('btnNext').disabled = true;
+    selectedOpt = null;
+    answered = false;
+  }
+
+  function selectOption(idx, el) {
+    if (answered) return;
+    document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedOpt = idx;
+  }
+
+  function submitAnswer() {
+    if (selectedOpt === null || answered) return;
+    answered = true;
+
+    const d = quizData[currentQ];
+    const correct = selectedOpt === d.ans;
+    if (correct) score++;
+
+    /* Highlight options */
+    const opts = document.querySelectorAll('.quiz-option');
+    opts.forEach((o, i) => {
+      o.classList.add('disabled');
+      if (i === d.ans) o.classList.add('correct');
+      if (i === selectedOpt && !correct) o.classList.add('wrong');
+    });
+
+    /* Feedback */
+    const fb = document.getElementById('quizFeedback');
+    fb.className = 'quiz-feedback show';
+    fb.classList.add(correct ? 'correct-fb' : 'wrong-fb');
+    fb.innerHTML = correct
+      ? '✓ 回答正确！' + d.explain
+      : '✗ 回答错误。<br>' + d.explain;
+
+    document.getElementById('btnSubmit').disabled = true;
+    document.getElementById('btnNext').disabled = false;
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ >= quizData.length) {
+      showResult();
+      return;
+    }
+    selectedOpt = null;
+    answered = false;
+    renderProgress();
+    renderQuestion();
+  }
+
+  function showResult() {
+    document.getElementById('quizQuestion').textContent = '';
+    document.getElementById('quizOptions').innerHTML = '';
+    document.getElementById('quizFeedback').classList.remove('show');
+    document.getElementById('quizActions').style.display = 'none';
+    document.getElementById('quizProgress').innerHTML = '';
+
+    const msg = score === quizData.length ? '满腹经纶，诗心独具！'
+      : score >= quizData.length * 0.7 ? '博学多才，诗情洋溢！'
+      : score >= quizData.length * 0.4 ? '略有小成，继续品读！'
+      : '初窥门径，勤学不辍！';
+
+    document.getElementById('quizResult').innerHTML = `
+      <div class="score">${score} / ${quizData.length}</div>
+      <div class="score-msg">${msg}</div>
+      <br>
+      <button class="btn primary" onclick="initQuiz()">重新答题</button>
+    `;
+    document.getElementById('quizResult').classList.add('show');
+    document.getElementById('quizCounter').textContent = '';
+  }
+
+  /* ── Scroll to Top ── */
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('toTopBtn');
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  /* ── Nav Smooth Scroll ── */
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  /* ── Start ── */
+  initQuiz();
+</script>
+
+</body>
+</html>
